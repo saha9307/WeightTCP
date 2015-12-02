@@ -127,7 +127,7 @@ namespace HTTPServer
                 return 0; //не закрито
         }
 
-        public String GetStateOfWeight(int st) // функція отримує стан ваги (вкл / викл)
+        public String GetStateOfWeight() // функція отримує стан ваги (вкл / викл)
         {
             if (_serialPort.IsOpen == false)
                 return ">>Selected com port occupied by another process."; //вибраний com порт зайнятий іншим процессом 
@@ -151,7 +151,7 @@ namespace HTTPServer
                 Thread.Sleep(100);
             }
 
-            if (!String.IsNullOrEmpty(status))
+            if (status != null)
                 return ">>Weight included."; //вага включене
             else
                 return ">>The weight is off or isn't connected."; //вага виключена
@@ -159,47 +159,48 @@ namespace HTTPServer
 
         public String RemoveIncludeWeight() // функція включає / виключає вагу
         {
-            int timePause = 0;
-            if (GetStateOfWeight(0) == ">>Weight included.")
-                timePause = 400;
-            else
-                timePause = 3000;
+            //int timePause = 0;
+            //if (GetStateOfWeight(0) == ">>Weight included.")
+            //    timePause = 300;
+            //else
+            int timePause = 5000;
             if (_serialPort.IsOpen == false)
                 return ">>Selected com port occupied by another process."; //вибраний com порт зайнятий іншим процессом 
             _serialPort.DiscardInBuffer();
             _serialPort.DiscardOutBuffer();
             _serialPort.WriteLine("\x53\x53\x0D\x0A");
-            status = null;
+            Thread.Sleep(timePause);
+            //status = null;
 
-            numberOfCycle = 0;
-            while (String.IsNullOrEmpty(status))
-            {
-                if (numberOfCycle > 2)
-                    break;
-                try
-                {
-                    status = _serialPort.ReadLine();
-                }
-                catch (TimeoutException)
-                { }
-                numberOfCycle++;
-                Thread.Sleep(100);
-            }
-            if (!String.IsNullOrEmpty(status))
-            {
-                Thread.Sleep(timePause);
-                String st = GetStateOfWeight(1);
-                return (st == ">>The weight is off or not connected.") ? ">>Weight excluded." : st; // стан ваги після каманди вкл/викл
-            }
-            else
-            {
-                return ">>Time waiting for a response from the weight out. Please try again. Maybe the problem is with connecting weight, to check the cable for integrity and try again repeat weighing."; //якщо нема відповіді тоді відсутнє з'єднання з вагою
-            }
+            //numberOfCycle = 0;
+            //while (String.IsNullOrEmpty(status))
+            //{
+            //    if (numberOfCycle > 2)
+            //        break;
+            //    try
+            //    {
+            //        status = _serialPort.ReadLine();
+            //    }
+            //    catch (TimeoutException)
+            //    { }
+            //    numberOfCycle++;
+            //    Thread.Sleep(100);
+            //}
+            //if (status == null)
+            //{
+                //Thread.Sleep(timePause);
+                //String st = GetStateOfWeight();
+                return GetStateOfWeight(); // стан ваги після каманди вкл/викл
+            //}
+            //else
+            //{
+            //    return ">>Time waiting for a response from the weight out. Please try again. Maybe the problem is with connecting weight, to check the cable for integrity and try again repeat weighing."; //якщо нема відповіді тоді відсутнє з'єднання з вагою
+            //}
         }
 
         public String GetWeight() // функція отримує вагу
         {
-            if (weightName == "BDL" && GetStateOfWeight(0) == ">>The weight is off or not connected.")
+            if (weightName == "BDL" && GetStateOfWeight() == ">>The weight is off or not connected.")
                 return ">>The weight is off or not connected. For weighing initially include weight / check the connection with i repeat again.";
             if (_serialPort.IsOpen == false)
                 return ">>Selected com port occupied by another process."; //вибраний com порт зайнятий іншим процессом
@@ -301,7 +302,7 @@ namespace HTTPServer
                         massage = ComPort.GetWeight();
                         break;
                     case 2:
-                        massage = ComPort.GetStateOfWeight(0);
+                        massage = ComPort.GetStateOfWeight();
                         break;
                     case 3:
                         massage = ComPort.RemoveIncludeWeight();
