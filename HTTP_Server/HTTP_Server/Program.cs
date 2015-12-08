@@ -159,10 +159,6 @@ namespace HTTPServer
 
         public String RemoveIncludeWeight() // функція включає / виключає вагу
         {
-            //int timePause = 0;
-            //if (GetStateOfWeight(0) == ">>Weight included.")
-            //    timePause = 300;
-            //else
             int timePause = 5000;
             if (_serialPort.IsOpen == false)
                 return ">>Selected com port occupied by another process."; //вибраний com порт зайнятий іншим процессом 
@@ -170,32 +166,8 @@ namespace HTTPServer
             _serialPort.DiscardOutBuffer();
             _serialPort.WriteLine("\x53\x53\x0D\x0A");
             Thread.Sleep(timePause);
-            //status = null;
-
-            //numberOfCycle = 0;
-            //while (String.IsNullOrEmpty(status))
-            //{
-            //    if (numberOfCycle > 2)
-            //        break;
-            //    try
-            //    {
-            //        status = _serialPort.ReadLine();
-            //    }
-            //    catch (TimeoutException)
-            //    { }
-            //    numberOfCycle++;
-            //    Thread.Sleep(100);
-            //}
-            //if (status == null)
-            //{
-                //Thread.Sleep(timePause);
-                //String st = GetStateOfWeight();
-                return GetStateOfWeight(); // стан ваги після каманди вкл/викл
-            //}
-            //else
-            //{
-            //    return ">>Time waiting for a response from the weight out. Please try again. Maybe the problem is with connecting weight, to check the cable for integrity and try again repeat weighing."; //якщо нема відповіді тоді відсутнє з'єднання з вагою
-            //}
+          
+             return GetStateOfWeight(); // стан ваги після каманди вкл/викл        
         }
 
         public String GetWeight() // функція отримує вагу
@@ -223,7 +195,6 @@ namespace HTTPServer
 
             _serialPort.WriteLine(command);
 
-
             _continue = true;
             do
             {
@@ -241,13 +212,7 @@ namespace HTTPServer
                 catch (TimeoutException) {}
 
                 if (numberOfCycle > 4)
-                    break;
-                //try
-                //{
-                //    weight = _serialPort.ReadLine();
-                //}
-                //catch (TimeoutException)
-                //{ }
+                    break;              
                numberOfCycle++;
             }
             while (_continue);
@@ -280,7 +245,7 @@ namespace HTTPServer
             }
             catch (IOException)
             { }
-
+            
             int index = -1;
             int ID = 0;
             double pr;
@@ -288,7 +253,7 @@ namespace HTTPServer
             String massage = "";            
             if (Request.Contains("?id=") == true)
             {
-                Console.WriteLine(Request);
+                Console.WriteLine("" + Client.Client.RemoteEndPoint.ToString() + "\n" + Request);
                 index = Request.IndexOf("?id=");
                 pr = char.GetNumericValue(Request[index + 4]);
                 ID = Convert.ToInt32(pr);
